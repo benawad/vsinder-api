@@ -13,7 +13,6 @@ const meFields: Array<keyof User> = [
   "gender",
   "genderToShow",
   "goal",
-  "location",
   "ageRangeMax",
   "ageRangeMin",
   "birthday",
@@ -24,7 +23,8 @@ const quotedMeFields = meFields.map((x) => `"${x}"`).join(", ");
 export const getUser = (userId: string) =>
   getConnection()
     .query(
-      `select (u."pushToken" is not null or u."pushToken" != '') "hasPushToken", ${quotedMeFields},
+      `select (u."pushToken" is not null or u."pushToken" != '') "hasPushToken",
+      COALESCE("location", '') "location", ${quotedMeFields},
   array(select json_build_object('userId1', m."userId1", 'userId1', m."userId2")
     from match m
     where (m."userId1" = $2 and read1 = false)
