@@ -63,6 +63,9 @@ export class User extends BaseEntity {
   photoUrl: string;
 
   @Column("int", { default: 0 })
+  numSwipes: number;
+
+  @Column("int", { default: 0 })
   numLikes: number;
 
   @Column("text", { nullable: true })

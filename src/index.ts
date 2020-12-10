@@ -13,7 +13,7 @@ import { assert } from "superstruct";
 import { createConnection, getConnection } from "typeorm";
 import { createTokens } from "./auth/createTokens";
 import { isAuth } from "./auth/isAuth";
-import { __prod__ } from "./constants";
+import { activeSwipesMax, __prod__ } from "./constants";
 import { Match } from "./entities/Match";
 import { Message } from "./entities/Message";
 import { User } from "./entities/User";
@@ -47,6 +47,7 @@ import {
   IRateLimiterStoreOptions,
 } from "rate-limiter-flexible";
 import { rateLimitMiddleware } from "./rateLimitMiddleware";
+import { resetNumSwipesDaily } from "./resetNumSwipesDaily";
 
 const SECONDS_IN_A_DAY = 86400;
 
@@ -75,6 +76,7 @@ const main = async () => {
   };
 
   startPushNotificationRunner();
+  resetNumSwipesDaily();
 
   const wsUsers: Record<
     string,
@@ -386,7 +388,7 @@ const main = async () => {
       const paramNum = user.global ? 6 : 4;
       const loveWhere = `
         and goal = 'love'
-        and "genderToShow" = $${paramNum}
+        and ("genderToShow" = 'everyone' or "genderToShow" = $${paramNum})
         and $${paramNum + 1} <= date_part('year', age(birthday))
         and $${paramNum + 2} >= date_part('year', age(birthday))
         and "ageRangeMin" <= $${paramNum + 3}
@@ -435,22 +437,22 @@ const main = async () => {
         and array_length("codeImgIds", 1) >= 1
         and "shadowBanned" != true
         order by
-          case
-                ${
-                  user.goal === "love" && user.global
-                    ? `
-                when (u.location = $4 and v2 is not null)
-                then random() - 1.2
-                when (u.location = $5)
-                then random() - 1
-                `
-                    : ""
-                }
-                when (v2 is not null)
-                then random() - .2
-                else random()
-              end
-            limit 20;
+          (case
+            ${
+              user.goal === "love" && user.global
+                ? `
+            when (u.location = $4 and v2 is not null)
+            then random() - 1.2
+            when (u.location = $5)
+            then random() - 1
+            `
+                : ""
+            }
+            when (v2 is not null)
+            then random() - .2
+            else random()
+          end) - u."numSwipes" / ${activeSwipesMax}
+        limit 20;
         `,
         user.goal === "love" ? loveParams : friendParams
       );
@@ -834,6 +836,10 @@ const main = async () => {
         User.update(userId, { numLikes: () => '"numLikes" + 1' });
         wsSend(userId, { type: "new-like" });
       }
+
+      User.update(req.userId, {
+        numSwipes: () => `LEAST("numSwipes" + 1, ${activeSwipesMax})`,
+      });
     }
   );
 
