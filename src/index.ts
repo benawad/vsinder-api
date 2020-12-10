@@ -424,7 +424,7 @@ const main = async () => {
 
       const profiles = await getConnection().query(
         `
-        select id, flair, "displayName", date_part('year', age(birthday)) "age", bio, "codeImgIds", "photoUrl"
+        select u.id, flair, "displayName", date_part('year', age(birthday)) "age", bio, "codeImgIds", "photoUrl"
         from "user" u
         left join view v on v."viewerId" = $1 and u.id = v."targetId"
         left join view v2 on $2 = v2."targetId" and v2.liked = true and u.id = v2."viewerId"
@@ -862,16 +862,16 @@ const main = async () => {
 
       const [user] = await getConnection().query(
         `
-    select id, flair, "displayName", date_part('year', age(birthday)) "age", bio, "codeImgIds", "photoUrl"
+    select u.id, flair, "displayName", date_part('year', age(birthday)) "age", bio, "codeImgIds", "photoUrl"
     ${
       isMe
         ? `
     from "user" u
-    where  id = $1
+    where  u.id = $1
     `
         : `
     from "user" u, match m
-    where  m."userId1" = $1 and m."userId2" = $2 and id = $3
+    where  m."userId1" = $1 and m."userId2" = $2 and u.id = $3
     `
     }
     `,
