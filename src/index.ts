@@ -261,9 +261,13 @@ const main = async () => {
       const { rn } = JSON.parse(Buffer.from(state, "base64").toString());
       if (rn) {
         res.redirect(
-          `${__prod__ ? `vsinder://` : `exp://127.0.0.1:19000/`}tokens/${
-            req.user.accessToken
-          }/${req.user.refreshToken}`
+          `${
+            __prod__
+              ? `vsinder://`
+              : `exp:${
+                  process.env.SERVER_URL.replace("http:", "").split(":")[0]
+                }:19005/--/`
+          }tokens/${req.user.accessToken}/${req.user.refreshToken}`
         );
       } else {
         res.redirect(
