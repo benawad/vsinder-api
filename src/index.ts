@@ -50,7 +50,7 @@ import { rateLimitMiddleware } from "./rateLimitMiddleware";
 import { resetNumSwipesDaily } from "./resetNumSwipesDaily";
 import isUuid from "is-uuid";
 
-const SECONDS_IN_A_DAY = 86400;
+const SECONDS_IN_A_HALF_A_DAY = 86400 / 2;
 
 const main = async () => {
   const conn = await createConnection({
@@ -73,7 +73,7 @@ const main = async () => {
   const defaultRateLimitOpts: IRateLimiterStoreOptions = {
     storeClient: redisClient,
     execEvenly: false,
-    blockDuration: SECONDS_IN_A_DAY,
+    blockDuration: SECONDS_IN_A_HALF_A_DAY,
   };
 
   startPushNotificationRunner();
@@ -280,7 +280,7 @@ const main = async () => {
       new RateLimiterRedis({
         ...defaultRateLimitOpts,
         points: 100,
-        duration: SECONDS_IN_A_DAY,
+        duration: SECONDS_IN_A_HALF_A_DAY,
         keyPrefix: "rl/user/imgs/",
       })
     ),
@@ -305,7 +305,7 @@ const main = async () => {
       new RateLimiterRedis({
         ...defaultRateLimitOpts,
         points: 20,
-        duration: SECONDS_IN_A_DAY,
+        duration: SECONDS_IN_A_HALF_A_DAY,
         keyPrefix: "rl/user/push-token/",
       })
     ),
@@ -330,7 +330,7 @@ const main = async () => {
       new RateLimiterRedis({
         ...defaultRateLimitOpts,
         points: 100,
-        duration: SECONDS_IN_A_DAY,
+        duration: SECONDS_IN_A_HALF_A_DAY,
         keyPrefix: "rl/user/",
       })
     ),
@@ -363,7 +363,7 @@ const main = async () => {
       new RateLimiterRedis({
         ...defaultRateLimitOpts,
         points: 500,
-        duration: SECONDS_IN_A_DAY,
+        duration: SECONDS_IN_A_HALF_A_DAY,
         keyPrefix: "rl/feed/",
       }),
       "You've been using the app too much and hit the rate limit, come back tomorrow"
@@ -471,7 +471,7 @@ const main = async () => {
       new RateLimiterRedis({
         ...defaultRateLimitOpts,
         points: 500,
-        duration: SECONDS_IN_A_DAY,
+        duration: SECONDS_IN_A_HALF_A_DAY,
         keyPrefix: "rl/matches/",
       }),
       "You've been using the app too much and hit the rate limit, come back tomorrow"
@@ -567,7 +567,7 @@ const main = async () => {
       new RateLimiterRedis({
         ...defaultRateLimitOpts,
         points: 100,
-        duration: SECONDS_IN_A_DAY,
+        duration: SECONDS_IN_A_HALF_A_DAY,
         keyPrefix: "rl/unmatch/",
       })
     ),
@@ -595,7 +595,7 @@ const main = async () => {
       new RateLimiterRedis({
         ...defaultRateLimitOpts,
         points: 100,
-        duration: SECONDS_IN_A_DAY,
+        duration: SECONDS_IN_A_HALF_A_DAY,
         keyPrefix: "rl/report/",
       })
     ),
@@ -709,7 +709,7 @@ const main = async () => {
       new RateLimiterRedis({
         ...defaultRateLimitOpts,
         points: 1000,
-        duration: SECONDS_IN_A_DAY,
+        duration: SECONDS_IN_A_HALF_A_DAY,
         keyPrefix: "rl/message/",
       })
     ),
@@ -758,12 +758,12 @@ const main = async () => {
     rateLimitMiddleware(
       new RateLimiterRedis({
         ...defaultRateLimitOpts,
-        points: 100,
-        duration: SECONDS_IN_A_DAY,
+        points: 500,
+        duration: SECONDS_IN_A_HALF_A_DAY,
         blockDuration: 0,
         keyPrefix: "rl/view/",
       }),
-      `You've hit the rate limit of 100 swipes a day, come back in 24 hours`
+      `You've hit the rate limit of 500 swipes a day, come back tomorrow`
     ),
     async (req: any, res, next) => {
       try {
@@ -851,7 +851,7 @@ const main = async () => {
       new RateLimiterRedis({
         ...defaultRateLimitOpts,
         points: 200,
-        duration: SECONDS_IN_A_DAY,
+        duration: SECONDS_IN_A_HALF_A_DAY,
         keyPrefix: "rl/user/:id",
       })
     ),
