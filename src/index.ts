@@ -48,6 +48,7 @@ import {
 } from "rate-limiter-flexible";
 import { rateLimitMiddleware } from "./rateLimitMiddleware";
 import { resetNumSwipesDaily } from "./resetNumSwipesDaily";
+import isUuid from "is-uuid";
 
 const SECONDS_IN_A_DAY = 86400;
 
@@ -889,6 +890,16 @@ const main = async () => {
       });
     }
   );
+
+  router.post("/account/delete", isAuth(), async (req: any, res) => {
+    if (isUuid.v4(req.userId)) {
+      await User.delete(req.userId);
+    }
+
+    res.json({
+      ok: true,
+    });
+  });
 
   router.get("/me", isAuth(false), async (req: any, res) => {
     if (!req.userId) {
