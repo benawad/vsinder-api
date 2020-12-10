@@ -356,6 +356,30 @@ const main = async () => {
     }
   );
 
+  const MS_IN_HOUR = 1000 * 60 * 60;
+  const cache: Record<string, { data: any; date: Date }> = {};
+  router.get("/leaderboard/:category?", async (req, res) => {
+    let { category } = req.params;
+    if (!category) {
+      category = "overall";
+    }
+
+    if (
+      !(category in cache) ||
+      new Date().getTime() - cache[category].date.getTime() > MS_IN_HOUR
+    ) {
+      const data = await getConnection().query(`
+      select u.id, flair, "numLikes", "displayName", date_part('year', age(birthday)) "age", bio, "codeImgIds", "photoUrl"
+      from "user" u
+      order by u."numLikes" DESC
+      limit 10
+      `);
+      cache[category] = { data, date: new Date() };
+    }
+
+    res.send({ profiles: cache[category].data });
+  });
+
   router.get(
     "/feed",
     isAuth(),
