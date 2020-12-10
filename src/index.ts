@@ -671,7 +671,8 @@ const main = async () => {
                       type: "image",
                       title: {
                         type: "plain_text",
-                        text: u.displayName + " | " + u.photoUrl,
+                        text:
+                          u.displayName + " | " + u.bio + " | " + u.photoUrl,
                         emoji: true,
                       },
                       image_url: u.photoUrl,
