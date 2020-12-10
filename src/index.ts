@@ -746,6 +746,13 @@ const main = async () => {
         return;
       }
 
+      if (
+        !(await Match.findOne(getUserIdOrder(req.userId, req.body.recipientId)))
+      ) {
+        next(createError(400, "you got unmatched"));
+        return;
+      }
+
       const m = await Message.create({
         ...req.body,
         senderId: req.userId,
