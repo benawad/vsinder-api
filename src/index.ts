@@ -362,10 +362,15 @@ const main = async () => {
 
   const MS_IN_HOUR = 1000 * 60 * 60;
   const cache: Record<string, { data: any; date: Date }> = {};
-  router.get("/leaderboard/:category?", async (req, res) => {
+  router.get("/leaderboard/:category?", async (req, res, next) => {
     let { category } = req.params;
     if (!category) {
       category = "overall";
+    }
+
+    if (category !== "overall" && category !== "male") {
+      next(createError(400, "invalid category"));
+      return;
     }
 
     if (
@@ -375,6 +380,7 @@ const main = async () => {
       const data = await getConnection().query(`
       select u.id, flair, "numLikes", "displayName", date_part('year', age(birthday)) "age", bio, "codeImgIds", "photoUrl"
       from "user" u
+      ${category === "male" ? `where gender = 'male'` : ""}
       order by u."numLikes" DESC
       limit 10
       `);
