@@ -1,1 +1,1 @@
-Context: https://youtu.be/bfd8RyAJh6c
+This repo is old, I changed to a monorepo: https://github.com/benawad/vsinder
