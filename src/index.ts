@@ -700,7 +700,13 @@ const main = async () => {
                       title: {
                         type: "plain_text",
                         text:
-                          u.displayName + " | " + u.bio + " | " + u.photoUrl,
+                          u.displayName +
+                          " | " +
+                          u.gender +
+                          " | " +
+                          u.bio +
+                          " | " +
+                          u.photoUrl,
                         emoji: true,
                       },
                       image_url: u.photoUrl,
